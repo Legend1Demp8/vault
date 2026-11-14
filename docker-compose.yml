@@ -1,87 +1,121 @@
+# Секция определения всех сервисов (контейнеров), которые входят в проект
 services:
+  
+  # ---------------------------------------------------------------------------
+  # 1. СЕРВИС ГЕНЕРАЦИИ СЕРТИФИКАТОВ И КОНФИГОВ (одноразовый контейнер)
+  # ---------------------------------------------------------------------------
   cert-gen:
+    # Образ Alpine Linux; версия подставляется из файла .env (переменная ALPINE_VERSION)
     image: alpine:${ALPINE_VERSION}
+    # Фиксированное имя контейнера для удобства просмотра логов
     container_name: vault-cert-gen
+    # Переменные окружения, передаваемые внутрь контейнера
     environment:
-      - HOST_IP=${HOST_IP}
+      - HOST_IP=${HOST_IP} # IP-адрес хоста (берется из .env) для формирования доменов nip.io
+    # Подключение папок и файлов с вашего компьютера внутрь контейнера (volumes)
     volumes:
-      - ./certs:/certs
-      - ./generate-certs.sh:/generate-certs.sh:ro
-      - ./vault.hcl.tpl:/vault.hcl.tpl:ro
-      - ./:/configs
+      - ./certs:/certs                               # Папка, куда скрипт сохранит сгенерированные сертификаты
+      - ./generate-certs.sh:/generate-certs.sh:ro    # Скрипт генерации (:ro означает "только для чтения")
+      - ./vault.hcl.tpl:/vault.hcl.tpl:ro            # Шаблон конфигурации Vault (только для чтения)
+      - ./:/configs                                  # Корневая папка проекта, куда скрипт положит готовые конфиги для нод
+    # Команда, которая выполнится при старте контейнера
     command: /bin/sh /generate-certs.sh
+    # Подключение контейнера к внутренней виртуальной сети
     networks:
       - vault-net
 
+  # ---------------------------------------------------------------------------
+  # 2. ПЕРВАЯ НОДА КЛАСТЕРА HASHICORP VAULT
+  # ---------------------------------------------------------------------------
   vault-node1:
+    # Официальный образ HashiCorp Vault; версия берется из файла .env
     image: hashicorp/vault:${VAULT_VERSION}
     container_name: vault-node1
+    # Управление порядком запуска контейнеров
     depends_on:
       cert-gen:
+        # Ждать, пока cert-gen полностью выполнит скрипт и завершится без ошибок (код 0)
         condition: service_completed_successfully
+    # Проброс портов: "порт_на_вашем_сервере:порт_внутри_контейнера"
     ports:
-      - "8200:8200"
+      - "8201:8200" # Веб-интерфейс и API первой ноды будут доступны по порту 8201
+    # Подключение папок для хранения конфигурации, данных и сертификатов
     volumes:
-      - ./node1/config:/vault/config
-      - ./node1/data:/vault/data
-      - ./certs/vault1:/vault/certs:ro
+      - ./node1/config:/vault/config       # Папка с готовым конфигом vault.hcl для первой ноды
+      - ./node1/data:/vault/data           # Постоянное хранилище данных Vault (чтобы не потерять секреты при перезапуске)
+      - ./certs/vault1:/vault/certs:ro     # Папка с TLS-сертификатами конкретно для первой ноды (только чтение)
+    # Расширенные системные привилегии Linux для контейнера
     cap_add:
-      - IPC_LOCK
+      - IPC_LOCK # Запрещает ОС сбрасывать оперативную память Vault в файл подкачки (swap) на диск ради безопасности
+    # Переменные окружения для работы самого Vault и его CLI-утилиты внутри контейнера
     environment:
-      - VAULT_ADDR=https://vault1.${HOST_IP}.nip.io:8200
-      - VAULT_CACERT=/vault/certs/ca.crt
+      - VAULT_ADDR=https://vault1.${HOST_IP}.nip.io:8200 # Внешний HTTPS-адрес этой ноды через сервис nip.io
+      - VAULT_CACERT=/vault/certs/ca.crt                 # Путь к корневому сертификату (CA), чтобы Vault доверял сам себе
+    # Команда запуска сервера Vault с указанием пути к конфигурационному файлу
     command: vault server -config=/vault/config/vault.hcl
+    # Настройки сети для этой ноды
     networks:
       vault-net:
+        # Сетевые псевдонимы (алиасы), по которым другие контейнеры внутри сети могут обращаться к этой ноде
         aliases:
           - vault1.${HOST_IP}.nip.io
 
+  # ---------------------------------------------------------------------------
+  # 3. ВТОРАЯ НОДА КЛАСТЕРА HASHICORP VAULT
+  # ---------------------------------------------------------------------------
   vault-node2:
     image: hashicorp/vault:${VAULT_VERSION}
     container_name: vault-node2
     depends_on:
       cert-gen:
-        condition: service_completed_successfully
+        condition: service_completed_successfully # Также ждет успешного завершения генератора сертификатов
     ports:
-      - "8202:8200"
+      - "8202:8200" # Внешний порт изменен на 8202, чтобы не конфликтовать с первой нодой (внутри остается 8200)
     volumes:
       - ./node2/config:/vault/config
       - ./node2/data:/vault/data
-      - ./certs/vault2:/vault/certs:ro
+      - ./certs/vault2:/vault/certs:ro # Использует свой набор сертификатов для vault2
     cap_add:
       - IPC_LOCK
     environment:
-      - VAULT_ADDR=https://vault2.${HOST_IP}.nip.io:8200
+      - VAULT_ADDR=https://vault2.${HOST_IP}.nip.io:8200 # Адрес второй ноды
       - VAULT_CACERT=/vault/certs/ca.crt
     command: vault server -config=/vault/config/vault.hcl
     networks:
       vault-net:
         aliases:
-          - vault2.${HOST_IP}.nip.io
+          - vault2.${HOST_IP}.nip.io # Внутренний DNS-алиас для второй ноды
 
+  # ---------------------------------------------------------------------------
+  # 4. ТРЕТЬЯ НОДА КЛАСТЕРА HASHICORP VAULT
+  # ---------------------------------------------------------------------------
   vault-node3:
     image: hashicorp/vault:${VAULT_VERSION}
     container_name: vault-node3
     depends_on:
       cert-gen:
-        condition: service_completed_successfully
+        condition: service_completed_successfully # Также ждет успешного завершения генератора сертификатов
     ports:
-      - "8204:8200"
+      - "8203:8200" # Внешний порт изменен на 8203, чтобы не конфликтовать с первой и второй нодами
     volumes:
       - ./node3/config:/vault/config
       - ./node3/data:/vault/data
-      - ./certs/vault3:/vault/certs:ro
+      - ./certs/vault3:/vault/certs:ro # Использует свой набор сертификатов для vault3
     cap_add:
       - IPC_LOCK
     environment:
-      - VAULT_ADDR=https://vault3.${HOST_IP}.nip.io:8200
+      - VAULT_ADDR=https://vault3.${HOST_IP}.nip.io:8200 # Адрес третьей ноды
       - VAULT_CACERT=/vault/certs/ca.crt
     command: vault server -config=/vault/config/vault.hcl
     networks:
       vault-net:
         aliases:
-          - vault3.${HOST_IP}.nip.io
+          - vault3.${HOST_IP}.nip.io # Внутренний DNS-алиас для третьей ноды
 
+# ---------------------------------------------------------------------------
+# СЕКЦИЯ НАСТРОЙКИ ВИРТУАЛЬНЫХ СЕТЕЙ
+# ---------------------------------------------------------------------------
 networks:
   vault-net:
+    # Стандартный сетевой драйвер Docker (мост), изолирующий контейнеры проекта и позволяющий им общаться по именам/алиасам
     driver: bridge
