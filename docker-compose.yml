@@ -1,0 +1,87 @@
+services:
+  cert-gen:
+    image: alpine:${ALPINE_VERSION}
+    container_name: vault-cert-gen
+    environment:
+      - HOST_IP=${HOST_IP}
+    volumes:
+      - ./certs:/certs
+      - ./generate-certs.sh:/generate-certs.sh:ro
+      - ./vault.hcl.tpl:/vault.hcl.tpl:ro
+      - ./:/configs
+    command: /bin/sh /generate-certs.sh
+    networks:
+      - vault-net
+
+  vault-node1:
+    image: hashicorp/vault:${VAULT_VERSION}
+    container_name: vault-node1
+    depends_on:
+      cert-gen:
+        condition: service_completed_successfully
+    ports:
+      - "8200:8200"
+    volumes:
+      - ./node1/config:/vault/config
+      - ./node1/data:/vault/data
+      - ./certs/vault1:/vault/certs:ro
+    cap_add:
+      - IPC_LOCK
+    environment:
+      - VAULT_ADDR=https://vault1.${HOST_IP}.nip.io:8200
+      - VAULT_CACERT=/vault/certs/ca.crt
+    command: vault server -config=/vault/config/vault.hcl
+    networks:
+      vault-net:
+        aliases:
+          - vault1.${HOST_IP}.nip.io
+
+  vault-node2:
+    image: hashicorp/vault:${VAULT_VERSION}
+    container_name: vault-node2
+    depends_on:
+      cert-gen:
+        condition: service_completed_successfully
+    ports:
+      - "8202:8200"
+    volumes:
+      - ./node2/config:/vault/config
+      - ./node2/data:/vault/data
+      - ./certs/vault2:/vault/certs:ro
+    cap_add:
+      - IPC_LOCK
+    environment:
+      - VAULT_ADDR=https://vault2.${HOST_IP}.nip.io:8200
+      - VAULT_CACERT=/vault/certs/ca.crt
+    command: vault server -config=/vault/config/vault.hcl
+    networks:
+      vault-net:
+        aliases:
+          - vault2.${HOST_IP}.nip.io
+
+  vault-node3:
+    image: hashicorp/vault:${VAULT_VERSION}
+    container_name: vault-node3
+    depends_on:
+      cert-gen:
+        condition: service_completed_successfully
+    ports:
+      - "8204:8200"
+    volumes:
+      - ./node3/config:/vault/config
+      - ./node3/data:/vault/data
+      - ./certs/vault3:/vault/certs:ro
+    cap_add:
+      - IPC_LOCK
+    environment:
+      - VAULT_ADDR=https://vault3.${HOST_IP}.nip.io:8200
+      - VAULT_CACERT=/vault/certs/ca.crt
+    command: vault server -config=/vault/config/vault.hcl
+    networks:
+      vault-net:
+        aliases:
+          - vault3.${HOST_IP}.nip.io
+
+networks:
+  vault-net:
+    driver: bridge

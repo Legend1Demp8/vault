@@ -1,0 +1,17 @@
+certs/
+
+# Базы данных и состояние Raft-кластера
+node*/data/*
+!node*/data/.gitkeep
+
+node*/config/vault.hcl
+
+# Защита от случайного коммита сохраненных ключей и токенов
+*unseal*
+*token*
+*secret*
+*.key
+*.pem
+*.crt
+*.srl
+*.db
