@@ -233,7 +233,7 @@ docker start vault-node1
 ```
 
 * **Распечатайте ноду:**
-После запуска контейнера распечатайте ноду с помощью 
+После запуска контейнера разблокируйте ноду используя сохраненные Unseal Key 
 ```
 docker exec -it vault-node1 vault operator unseal
 ```
