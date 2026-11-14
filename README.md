@@ -158,9 +158,9 @@ docker exec -it vault-node1 vault operator raft list-peers
 
 Веб-интерфейс каждой ноды доступен по HTTPS (при первом входе примите предупреждение браузера о самоподписанном сертификате или импортируйте `certs/ca/ca.crt` в доверенные корневые центры ОС):
 
-* **Node 1:** `https://vault1.<HOST_IP>.nip.io:8200`
+* **Node 1:** `https://vault1.<HOST_IP>.nip.io:8201`
 * **Node 2:** `https://vault2.<HOST_IP>.nip.io:8202`
-* **Node 3:** `https://vault3.<HOST_IP>.nip.io:8204`
+* **Node 3:** `https://vault3.<HOST_IP>.nip.io:8203`
 
 ## Эксплуатация и обслуживание
 
