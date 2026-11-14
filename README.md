@@ -1,6 +1,6 @@
 # HashiCorp Vault — 3-Node Raft Cluster (Docker)
 
-Отказоустойчивый трехнодовый кластер **HashiCorp Vault** в Docker Compose на базе встроенного хранилища **Integrated Storage (Raft)** с автоматическим выпуском и продлением самоподписанных TLS-сертификатов через сервис `nip.io`.
+Отказоустойчивый трехнодовый кластер **HashiCorp Vault** в Docker Compose на базе встроенного хранилища **Integrated Storage (Raft)** с HAProxy и автоматическим выпуском и продлением самоподписанных TLS-сертификатов через сервис `nip.io`.
 
 ## Особенности архитектуры
 
