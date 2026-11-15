@@ -43,9 +43,9 @@
 | :--- | :--- | :---: | :--- |
 | **Vault UI / API (HAProxy)** | `https://vault.<HOST_IP>.nip.io/ui/` | `443` | Единая точка входа, всегда ведет на активного лидера |
 | **HAProxy Stats** | `https://vault.<HOST_IP>.nip.io:8404/stats` | `8404` | Веб-панель мониторинга состояния нод и переключений |
-| **Vault Node 1 (прямой)** | `https://vault1.<HOST_IP>.nip.io:8201` | `8201` | Прямой доступ к первой ноде (для инициализации и unseal) |
-| **Vault Node 2 (прямой)** | `https://vault2.<HOST_IP>.nip.io:8202` | `8202` | Прямой доступ ко второй ноде |
-| **Vault Node 3 (прямой)** | `https://vault3.<HOST_IP>.nip.io:8203` | `8203` | Прямой доступ к третьей ноде |
+| **Vault Node 1 (прямой)** | `https://vault1.<HOST_IP>.nip.io:18201` | `18201` | Прямой доступ к первой ноде  |
+| **Vault Node 2 (прямой)** | `https://vault2.<HOST_IP>.nip.io:18202` | `18202` | Прямой доступ ко второй ноде |
+| **Vault Node 3 (прямой)** | `https://vault3.<HOST_IP>.nip.io:18203` | `18203` | Прямой доступ к третьей ноде |
 
 ## Схема работы
 <img width="1286" height="691" alt="vault" src="https://github.com/user-attachments/assets/6363f822-3b90-4240-85af-fc79f81ea299" />
