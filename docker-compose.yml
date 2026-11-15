@@ -26,6 +26,19 @@ services:
       - vault-net
 
   # ---------------------------------------------------------------------------
+  # 1.5. ВСПОМОГАТЕЛЬНЫЙ КОНТЕЙНЕР (ТОЛЬКО ДЛЯ ПРАВ НА ТОМА ДАННЫХ)
+  # ---------------------------------------------------------------------------
+  volume-init:
+    image: alpine:${ALPINE_VERSION}
+    container_name: vault-volume-init
+    volumes:
+      - vault-node1-data:/data1
+      - vault-node2-data:/data2
+      - vault-node3-data:/data3
+    # Меняем владельца только у самих корневых папок
+    command: chown -R 100:1000 /data1 /data2 /data3
+
+  # ---------------------------------------------------------------------------
   # 2. ПЕРВАЯ НОДА КЛАСТЕРА HASHICORP VAULT
   # ---------------------------------------------------------------------------
   vault-node1:
@@ -36,6 +49,9 @@ services:
     depends_on:
       cert-gen:
         # Ждать, пока cert-gen полностью выполнит скрипт и завершится без ошибок (код 0)
+        condition: service_completed_successfully
+      volume-init:
+        # Ждать, пока init-контейнер выдаст права пользователю vault (100:1000) на тома данных
         condition: service_completed_successfully
     # Проброс портов: "порт_на_вашем_сервере:порт_внутри_контейнера"
     ports:
@@ -70,6 +86,9 @@ services:
     depends_on:
       cert-gen:
         condition: service_completed_successfully # Также ждет успешного завершения генератора сертификатов
+      volume-init:
+        # Ждать, пока init-контейнер выдаст права пользователю vault (100:1000) на тома данных
+        condition: service_completed_successfully
     ports:
       - "18202:8200" # Внешний порт изменен на 18202, чтобы не конфликтовать с первой нодой (внутри остается 8200)
     volumes:
@@ -96,6 +115,9 @@ services:
     depends_on:
       cert-gen:
         condition: service_completed_successfully # Также ждет успешного завершения генератора сертификатов
+      volume-init:
+        # Ждать, пока init-контейнер выдаст права пользователю vault (100:1000) на тома данных
+        condition: service_completed_successfully
     ports:
       - "18203:8200" # Внешний порт изменен на 18203, чтобы не конфликтовать с первой и второй нодами
     volumes:
