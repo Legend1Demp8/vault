@@ -47,7 +47,8 @@
 | **Vault Node 3 (прямой)** | `https://vault3.<HOST_IP>.nip.io:18203` | `18203` | Прямой доступ к третьей ноде |
 
 ## Схема работы
-<img width="1316" height="691" alt="Vault" src="https://github.com/user-attachments/assets/bde90b86-f27e-4867-bece-7c40cdd77540" />
+<img width="1316" height="691" alt="vault (1)" src="https://github.com/user-attachments/assets/a59c0db8-1f93-4cb9-8f67-473e7721dd86" />
+
 
 
 
