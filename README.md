@@ -1,4 +1,3 @@
-<img width="1316" height="691" alt="Vault" src="https://github.com/user-attachments/assets/7ffef6ae-698b-4f1e-b694-df26f21d0d61" />
 # HashiCorp Vault — 3-Node Raft Cluster with HAProxy (Docker)
 
 Отказоустойчивый трехнодовый кластер **HashiCorp Vault** в Docker Compose на базе встроенного хранилища **Integrated Storage (Raft)** с балансировщиком нагрузки **HAProxy** и автоматическим выпуском самоподписанных TLS-сертификатов через сервис `nip.io`.
