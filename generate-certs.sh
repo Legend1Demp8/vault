@@ -45,9 +45,11 @@ setup_root_ca() {
     if [ ! -f "$CA_CERT" ] || [ ! -f "$CA_KEY" ]; then
         echo "Генерация нового корневого CA на базе ECDSA P-384 (срок действия 10 лет)..."
         openssl ecparam -name secp384r1 -genkey -noout -out "$CA_KEY"
-        openssl req -x509 -new -nodes -key "$CA_KEY" -sha256 -days 3650 \
+	openssl req -x509 -new -nodes -key "$CA_KEY" -sha384 -days 3650 \
             -out "$CA_CERT" \
-            -subj "${CERT_SUBJ_PREFIX}/CN=Vault Root CA"
+            -subj "${CERT_SUBJ_PREFIX}/CN=Vault Root CA" \
+            -addext "basicConstraints=critical,CA:TRUE" \
+            -addext "keyUsage=critical,keyCertSign,cRLSign"
     else
         echo "Корневой CA уже существует. Пропускаем."
     fi
