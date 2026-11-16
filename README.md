@@ -262,7 +262,7 @@ services:
     volumes:
       - ./vault.json:/vault/config/vault.json:ro
       - ./certs:/vault/certs:ro
-      - vault1_data:/vault/data
+      - vault1_data:/vault/file
 
   vault2:
     image: hashicorp/vault:latest
@@ -277,7 +277,7 @@ services:
     volumes:
       - ./vault.json:/vault/config/vault.json:ro
       - ./certs:/vault/certs:ro
-      - vault2_data:/vault/data
+      - vault2_data:/vault/file
 
   vault3:
     image: hashicorp/vault:latest
@@ -292,10 +292,51 @@ services:
     volumes:
       - ./vault.json:/vault/config/vault.json:ro
       - ./certs:/vault/certs:ro
-      - vault3_data:/vault/data
+      - vault3_data:/vault/file
 
 volumes:
   vault1_data:
   vault2_data:
   vault3_data:
+```
+
+```
+{
+  "cluster_name": "vault-production",
+  "ui": true,
+  "disable_mlock": true,
+  "storage": {
+    "raft": {
+      "path": "/vault/file",
+      "node_id": "node__NODE_NUM__",
+      "retry_join": [
+        {
+          "leader_api_addr": "https://vault__PEER_1__.__HOST_IP__.nip.io:8200",
+          "leader_ca_cert_file": "/vault/certs/ca.crt",
+          "leader_client_cert_file": "/vault/certs/vault.crt",
+          "leader_client_key_file": "/vault/certs/vault.key"
+        },
+        {
+          "leader_api_addr": "https://vault__PEER_2__.__HOST_IP__.nip.io:8200",
+          "leader_ca_cert_file": "/vault/certs/ca.crt",
+          "leader_client_cert_file": "/vault/certs/vault.crt",
+          "leader_client_key_file": "/vault/certs/vault.key"
+        }
+      ]
+    }
+  },
+  "listener": [
+    {
+      "tcp": {
+        "address": "0.0.0.0:8200",
+        "tls_disable": false,
+        "tls_cert_file": "/vault/certs/vault.crt",
+        "tls_key_file": "/vault/certs/vault.key",
+        "tls_client_ca_file": "/vault/certs/ca.crt"
+      }
+    }
+  ],
+  "api_addr": "https://vault__NODE_NUM__.__HOST_IP__.nip.io:8200",
+  "cluster_addr": "https://vault__NODE_NUM__.__HOST_IP__.nip.io:8201"
+}
 ```
