@@ -2,8 +2,6 @@
   "cluster_name": "vault-production",
   "ui": true,
   "disable_mlock": true,
-  "plugin_directory": "/vault/plugins",
-  "plugin_tmpdir": "/vault/plugins/tmp",
   "storage": {
     "raft": {
       "path": "/vault/data",
@@ -28,6 +26,7 @@
     {
       "tcp": {
         "address": "0.0.0.0:8200",
+        "tls_disable": false,
         "tls_cert_file": "/vault/certs/vault.crt",
         "tls_key_file": "/vault/certs/vault.key",
         "tls_client_ca_file": "/vault/certs/ca.crt"
