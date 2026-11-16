@@ -246,3 +246,56 @@ docker exec -it vault-node1 vault operator unseal
 docker compose restart cert-gen
 docker kill -s SIGHUP vault-node1 vault-node2 vault-node3
 ```
+
+```
+services:
+  vault1:
+    image: hashicorp/vault:latest
+    container_name: vault1
+    restart: unless-stopped
+    cap_add:
+      - IPC_LOCK
+    environment:
+      VAULT_RAFT_NODE_ID: "node1"
+      VAULT_API_ADDR: "https://vault1.${HOST_IP}.nip.io:8200"
+      VAULT_CLUSTER_ADDR: "https://vault1.${HOST_IP}.nip.io:8201"
+    volumes:
+      - ./vault.json:/vault/config/vault.json:ro
+      - ./certs:/vault/certs:ro
+      - vault1_data:/vault/data
+
+  vault2:
+    image: hashicorp/vault:latest
+    container_name: vault2
+    restart: unless-stopped
+    cap_add:
+      - IPC_LOCK
+    environment:
+      VAULT_RAFT_NODE_ID: "node2"
+      VAULT_API_ADDR: "https://vault2.${HOST_IP}.nip.io:8200"
+      VAULT_CLUSTER_ADDR: "https://vault2.${HOST_IP}.nip.io:8201"
+    volumes:
+      - ./vault.json:/vault/config/vault.json:ro
+      - ./certs:/vault/certs:ro
+      - vault2_data:/vault/data
+
+  vault3:
+    image: hashicorp/vault:latest
+    container_name: vault3
+    restart: unless-stopped
+    cap_add:
+      - IPC_LOCK
+    environment:
+      VAULT_RAFT_NODE_ID: "node3"
+      VAULT_API_ADDR: "https://vault3.${HOST_IP}.nip.io:8200"
+      VAULT_CLUSTER_ADDR: "https://vault3.${HOST_IP}.nip.io:8201"
+    volumes:
+      - ./vault.json:/vault/config/vault.json:ro
+      - ./certs:/vault/certs:ro
+      - vault3_data:/vault/data
+
+volumes:
+  vault1_data:
+  vault2_data:
+  vault3_data:
+```
