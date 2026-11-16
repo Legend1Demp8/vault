@@ -2,6 +2,8 @@
   "cluster_name": "vault-production",
   "ui": true,
   "disable_mlock": true,
+  "plugin_directory": "/vault/plugins",
+  "plugin_tmpdir": "/vault/plugins/tmp",
   "storage": {
     "raft": {
       "path": "/vault/data",
