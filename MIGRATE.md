@@ -136,16 +136,140 @@ for k in db config cert; do echo "=== $k ==="; docker exec vault-node1 vault kv 
 <details>
 <summary>Нажмите, чтобы развернуть список</summary>
 
-#### 1. Инициализируем хранилище KV V1
+#### 1. Инициализируем хранилище KV V2
 ```
 docker exec -it vault-node1 vault secrets enable -path=secret-v2 kv-v2
 ```
-#### 2. Заполняем данными хранилище KV V1
+#### 2. Заполняем данными хранилище KV V2
 ```
+docker exec -it vault-node1 vault kv put secret-v2/app/db user="admin" pass="v1_password_2026"
+docker exec -it vault-node1 vault kv patch secret-v2/app/db pass="v2_super_secret"
 
+docker exec -it vault-node1 vault kv put secret-v2/app/tokens stripe="sk_live_998877" telegram="bot_112233"
+docker exec -it vault-node1 vault kv metadata put -max-versions=3 -custom-metadata=owner="backend-team" -custom-metadata=env="prod" secret-v2/app/tokens
+
+docker exec -i vault-node1 vault kv put secret-v2/app/service - <<EOF
+{
+  "api_url": "https://internal.local",
+  "retries": 5,
+  "debug_mode": false,
+  "allowed_ips": ["10.10.10.1", "10.10.10.2"]
+}
+EOF
 ```
 #### 3. Проверяем как сохранилось
 ```
+for k in db service tokens; do echo "=== $k ==="; docker exec vault-node1 vault kv get -format=json secret-v2/app/$k | jq '.data.data'; done
+=== db ===
+{
+  "pass": "v2_super_secret",
+  "user": "admin"
+}
+=== service ===
+{
+  "allowed_ips": [
+    "10.10.10.1",
+    "10.10.10.2"
+  ],
+  "api_url": "https://internal.local",
+  "debug_mode": false,
+  "retries": 5
+}
+=== tokens ===
+{
+  "stripe": "sk_live_998877",
+  "telegram": "bot_112233"
+}
+
+docker exec -it vault-node1 vault kv metadata get -format=json secret-v2/app/db
+{
+  "request_id": "8e18ffef-f844-e2be-5d72-ec4f911755ca",
+  "lease_id": "",
+  "lease_duration": 0,
+  "renewable": false,
+  "data": {
+    "cas_required": false,
+    "created_time": "2026-11-22T12:26:43.382922517Z",
+    "current_version": 2,
+    "custom_metadata": null,
+    "delete_version_after": "0s",
+    "last_updated_by": {
+      "actor": "root",
+      "client_id": "0DHqvq2D77kL2/JTPSZkTMJbkFVmUu0TzMi0jiXcFy8=",
+      "operation": "patch"
+    },
+    "max_versions": 0,
+    "oldest_version": 0,
+    "updated_time": "2026-11-22T12:30:16.156196898Z",
+    "versions": {
+      "1": {
+        "created_by": {
+          "actor": "root",
+          "client_id": "0DHqvq2D77kL2/JTPSZkTMJbkFVmUu0TzMi0jiXcFy8=",
+          "operation": "create"
+        },
+        "created_time": "2026-11-22T12:26:43.382922517Z",
+        "deleted_by": null,
+        "deletion_time": "",
+        "destroyed": false
+      },
+      "2": {
+        "created_by": {
+          "actor": "root",
+          "client_id": "0DHqvq2D77kL2/JTPSZkTMJbkFVmUu0TzMi0jiXcFy8=",
+          "operation": "patch"
+        },
+        "created_time": "2026-11-22T12:30:16.156196898Z",
+        "deleted_by": null,
+        "deletion_time": "",
+        "destroyed": false
+      }
+    }
+  },
+  "warnings": null,
+  "mount_type": "kv"
+}
+
+docker exec -it vault-node1 vault kv metadata get -format=json secret-v2/app/tokens
+{
+  "request_id": "0eb21a00-00db-9747-838f-4956322b6b48",
+  "lease_id": "",
+  "lease_duration": 0,
+  "renewable": false,
+  "data": {
+    "cas_required": false,
+    "created_time": "2026-11-22T12:28:40.084624758Z",
+    "current_version": 1,
+    "custom_metadata": {
+      "env": "prod",
+      "owner": "backend-team"
+    },
+    "delete_version_after": "0s",
+    "last_updated_by": {
+      "actor": "root",
+      "client_id": "0DHqvq2D77kL2/JTPSZkTMJbkFVmUu0TzMi0jiXcFy8=",
+      "operation": "create"
+    },
+    "max_versions": 3,
+    "oldest_version": 0,
+    "updated_time": "2026-11-22T12:28:40.084624758Z",
+    "versions": {
+      "1": {
+        "created_by": {
+          "actor": "root",
+          "client_id": "0DHqvq2D77kL2/JTPSZkTMJbkFVmUu0TzMi0jiXcFy8=",
+          "operation": "create"
+        },
+        "created_time": "2026-11-22T12:28:40.084624758Z",
+        "deleted_by": null,
+        "deletion_time": "",
+        "destroyed": false
+      }
+    }
+  },
+  "warnings": null,
+  "mount_type": "kv"
+}
 
 ```
 #### 4. Переезд на OpenBao и проверка
