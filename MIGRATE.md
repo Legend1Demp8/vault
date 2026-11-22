@@ -15,8 +15,8 @@ docker compose down
 #### 3. Заменить образ в `docker-compose.yml`
 Для сервисов `vault-node1`, `vault-node2` и `vault-node3` обновите параметр `image`:
 ```diff
--   image: haproxy:\${HAPROXY_VERSION}
-+   image: openbao/openbao:\${OPENBAO_VERSION}
+-   image: haproxy:${HAPROXY_VERSION}
++   image: openbao/openbao:${OPENBAO_VERSION}
 ```
 
 #### 4. Обновить команду запуска в `docker-compose.yml`
