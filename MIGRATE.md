@@ -1,5 +1,8 @@
 # Переезд Vault CE (2.2.2) в OpenBao (2.7.3)
 
+## Что может быть перенесено и не вызовет проблем
+В OpenBao без проблем переезжают практически все стандартные ресурсы HashiCorp Vault CE: секреты, методы аутентификации, политики ACL, настройки PKI/Transit, токены и аудит-логи.
+
 ## Процесс переезда
 ### Необходимые изменения в проекте
 
@@ -26,6 +29,3 @@ docker compose down
 -   command: vault server -config=/vault/config/vault.hcl
 +   command: bao server -config=/vault/config/vault.hcl
 ```
-
-
-В OpenBao без проблем переезжают практически все стандартные ресурсы HashiCorp Vault CE: секреты, методы аутентификации, политики ACL, настройки PKI/Transit, токены и аудит-логи.
