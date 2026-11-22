@@ -132,12 +132,28 @@ for k in db config cert; do echo "=== $k ==="; docker exec vault-node1 vault kv 
 ```
 </details>
 
-#### Хранилище секретов KV V2
+### Тест 2: Хранилище секретов KV V2
+<details>
+<summary>Нажмите, чтобы развернуть список</summary>
 
-# Инициализируем хранилище KV V2
+#### 1. Инициализируем хранилище KV V1
+```
 docker exec -it vault-node1 vault secrets enable -path=secret-v2 kv-v2
+```
+#### 2. Заполняем данными хранилище KV V1
+```
 
+```
+#### 3. Проверяем как сохранилось
+```
 
+```
+#### 4. Переезд на OpenBao и проверка
+```
+
+```
+
+</details>
 
 ### Тест N: Хранилище секретов KV V1
 <details>
