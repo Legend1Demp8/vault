@@ -329,6 +329,142 @@ docker exec -it vault-node1 vault kv metadata get -format=json secret-v2/app/tok
 ```
 #### 4. Переезд на OpenBao и проверка
 ```
+for k in db service tokens; do echo "=== $k ==="; docker exec vault-node3 bao kv get -format=json secret-v2/app/$k; done
+=== db ===
+{
+  "request_id": "f90fca9c-cc59-21b3-2363-16bb08a3ab86",
+  "lease_id": "",
+  "lease_duration": 0,
+  "renewable": false,
+  "data": {
+    "data": {
+      "pass": "v2_super_secret",
+      "user": "admin"
+    },
+    "metadata": {
+      "created_time": "2026-11-22T12:30:16.156196898Z",
+      "custom_metadata": null,
+      "deletion_time": "",
+      "destroyed": false,
+      "version": 2
+    }
+  },
+  "warnings": null
+}
+=== service ===
+{
+  "request_id": "770300cc-a5a9-e6b6-ac7a-66a8d155fec5",
+  "lease_id": "",
+  "lease_duration": 0,
+  "renewable": false,
+  "data": {
+    "data": {
+      "allowed_ips": [
+        "10.10.10.1",
+        "10.10.10.2"
+      ],
+      "api_url": "https://internal.local",
+      "debug_mode": false,
+      "retries": 5
+    },
+    "metadata": {
+      "created_time": "2026-11-22T12:27:50.978243601Z",
+      "custom_metadata": null,
+      "deletion_time": "",
+      "destroyed": false,
+      "version": 1
+    }
+  },
+  "warnings": null
+}
+=== tokens ===
+{
+  "request_id": "1f0926d5-970a-a290-cbda-966ca3878aec",
+  "lease_id": "",
+  "lease_duration": 0,
+  "renewable": false,
+  "data": {
+    "data": {
+      "stripe": "sk_live_998877",
+      "telegram": "bot_112233"
+    },
+    "metadata": {
+      "created_time": "2026-11-22T12:28:40.084624758Z",
+      "custom_metadata": {
+        "env": "prod",
+        "owner": "backend-team"
+      },
+      "deletion_time": "",
+      "destroyed": false,
+      "version": 1
+    }
+  },
+  "warnings": null
+}
+
+docker exec -it vault-node3 bao kv metadata get -format=json secret-v2/app/db
+{
+  "request_id": "d2311eba-ad8d-10dd-218e-3b93768c9642",
+  "lease_id": "",
+  "lease_duration": 0,
+  "renewable": false,
+  "data": {
+    "cas_required": false,
+    "created_time": "2026-11-22T12:26:43.382922517Z",
+    "current_metadata_version": 0,
+    "current_version": 2,
+    "custom_metadata": null,
+    "delete_version_after": "0s",
+    "max_versions": 0,
+    "metadata_cas_required": false,
+    "oldest_version": 0,
+    "updated_time": "2026-11-22T12:30:16.156196898Z",
+    "versions": {
+      "1": {
+        "created_time": "2026-11-22T12:26:43.382922517Z",
+        "deletion_time": "",
+        "destroyed": false
+      },
+      "2": {
+        "created_time": "2026-11-22T12:30:16.156196898Z",
+        "deletion_time": "",
+        "destroyed": false
+      }
+    }
+  },
+  "warnings": null
+}
+
+docker exec -it vault-node3 bao kv metadata get -format=json secret-v2/app/tokens
+{
+  "request_id": "658f99e6-0b89-3979-1ed4-d708cb0ab436",
+  "lease_id": "",
+  "lease_duration": 0,
+  "renewable": false,
+  "data": {
+    "cas_required": false,
+    "created_time": "2026-11-22T12:28:40.084624758Z",
+    "current_metadata_version": 0,
+    "current_version": 1,
+    "custom_metadata": {
+      "env": "prod",
+      "owner": "backend-team"
+    },
+    "delete_version_after": "0s",
+    "max_versions": 3,
+    "metadata_cas_required": false,
+    "oldest_version": 0,
+    "updated_time": "2026-11-22T12:28:40.084624758Z",
+    "versions": {
+      "1": {
+        "created_time": "2026-11-22T12:28:40.084624758Z",
+        "deletion_time": "",
+        "destroyed": false
+      }
+    }
+  },
+  "warnings": null
+}
 
 ```
 
