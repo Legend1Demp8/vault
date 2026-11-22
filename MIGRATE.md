@@ -159,27 +159,82 @@ EOF
 ```
 #### 3. Проверяем как сохранилось
 ```
-for k in db service tokens; do echo "=== $k ==="; docker exec vault-node1 vault kv get -format=json secret-v2/app/$k | jq '.data.data'; done
+for k in db service tokens; do echo "=== $k ==="; docker exec vault-node1 vault kv get -format=json secret-v2/app/$k; done
 === db ===
 {
-  "pass": "v2_super_secret",
-  "user": "admin"
+  "request_id": "8e264c33-bde5-9782-aa36-a5f8c985b6e7",
+  "lease_id": "",
+  "lease_duration": 0,
+  "renewable": false,
+  "data": {
+    "data": {
+      "pass": "v2_super_secret",
+      "user": "admin"
+    },
+    "metadata": {
+      "created_time": "2026-11-22T12:30:16.156196898Z",
+      "custom_metadata": null,
+      "deletion_time": "",
+      "destroyed": false,
+      "version": 2
+    }
+  },
+  "warnings": null,
+  "mount_type": "kv"
 }
 === service ===
 {
-  "allowed_ips": [
-    "10.10.10.1",
-    "10.10.10.2"
-  ],
-  "api_url": "https://internal.local",
-  "debug_mode": false,
-  "retries": 5
+  "request_id": "cafd831c-f78a-5277-9584-84375f8b208f",
+  "lease_id": "",
+  "lease_duration": 0,
+  "renewable": false,
+  "data": {
+    "data": {
+      "allowed_ips": [
+        "10.10.10.1",
+        "10.10.10.2"
+      ],
+      "api_url": "https://internal.local",
+      "debug_mode": false,
+      "retries": 5
+    },
+    "metadata": {
+      "created_time": "2026-11-22T12:27:50.978243601Z",
+      "custom_metadata": null,
+      "deletion_time": "",
+      "destroyed": false,
+      "version": 1
+    }
+  },
+  "warnings": null,
+  "mount_type": "kv"
 }
 === tokens ===
 {
-  "stripe": "sk_live_998877",
-  "telegram": "bot_112233"
+  "request_id": "697ab777-ae97-2bcf-795e-d4fcdf47aa6e",
+  "lease_id": "",
+  "lease_duration": 0,
+  "renewable": false,
+  "data": {
+    "data": {
+      "stripe": "sk_live_998877",
+      "telegram": "bot_112233"
+    },
+    "metadata": {
+      "created_time": "2026-11-22T12:28:40.084624758Z",
+      "custom_metadata": {
+        "env": "prod",
+        "owner": "backend-team"
+      },
+      "deletion_time": "",
+      "destroyed": false,
+      "version": 1
+    }
+  },
+  "warnings": null,
+  "mount_type": "kv"
 }
+
 
 docker exec -it vault-node1 vault kv metadata get -format=json secret-v2/app/db
 {
