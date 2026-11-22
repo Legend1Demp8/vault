@@ -84,7 +84,43 @@ for k in db config cert; do echo "=== $k ==="; docker exec vault-node1 vault kv 
 }
 ```
 #### 4. Переезд на OpenBao и проверка
-
+```
+=== db ===
+{
+  "request_id": "5a76e0ee-ca54-d0fb-2c8a-61f14d317007",
+  "lease_id": "",
+  "lease_duration": 2764800,
+  "renewable": false,
+  "data": {
+    "host": "10.10.10.10",
+    "password": "old_password_1010",
+    "port": "1010"
+  },
+  "warnings": null
+}
+=== config ===
+{
+  "request_id": "91ac8e5d-3687-dbbb-ab2b-5f2169a3b07e",
+  "lease_id": "",
+  "lease_duration": 2764800,
+  "renewable": false,
+  "data": {
+    "mode": "old_string_1010"
+  },
+  "warnings": null
+}
+=== cert ===
+{
+  "request_id": "b7cdee4e-262b-3a20-3a2d-cf3386424266",
+  "lease_id": "",
+  "lease_duration": 2764800,
+  "renewable": false,
+  "data": {
+    "crt": "-----BEGIN CERTIFICATE-----\nold_cert_1010\n-----END CERTIFICATE-----\n"
+  },
+  "warnings": null
+}
+```
 
 
 #### Хранилище секретов KV V2
