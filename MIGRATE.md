@@ -470,7 +470,7 @@ docker exec -it vault-node3 bao kv metadata get -format=json secret-v2/app/token
 
 </details>
 
-### Тест N: Хранилище секретов KV V1
+### Тест N: 
 <details>
 <summary>Нажмите, чтобы развернуть список</summary>
 
