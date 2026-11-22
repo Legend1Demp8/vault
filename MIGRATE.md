@@ -20,9 +20,12 @@
 | Функция | Результат переноса | Изменения в структуре данных | Повторный перенос в Vault |
 | --- | --- | --- | --- |
 | Хранилище секретов KV V1 | OpenBao запустился, секреты доступны | Есть | Vault не видит данные |
-| Ячейка 4 | Ячейка 5 | Ячейка 6 | |
+| Хранилище секретов KV V1 | OpenBao запустился, секреты доступны | Есть | Vault не видит данные |
 
 ### Хранилище секретов KV V1
+<details>
+<summary>Нажмите, чтобы развернуть список</summary>
+	
 #### 1. Инициализируем хранилище KV V1
 ```
 docker exec -it vault-node1 vault secrets enable -path=secret-v1 kv-v1
@@ -127,7 +130,7 @@ for k in db config cert; do echo "=== $k ==="; docker exec vault-node1 vault kv 
   "warnings": null
 }
 ```
-
+</details>
 
 #### Хранилище секретов KV V2
 
