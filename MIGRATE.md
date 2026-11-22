@@ -22,7 +22,7 @@
 | Хранилище секретов KV V1 | OpenBao запустился, секреты доступны | Есть | Vault не видит данные |
 | Хранилище секретов KV V1 | OpenBao запустился, секреты доступны | Есть | Vault не видит данные |
 
-### Хранилище секретов KV V1
+### Тест 1: Хранилище секретов KV V1
 <details>
 <summary>Нажмите, чтобы развернуть список</summary>
 	
@@ -136,6 +136,32 @@ for k in db config cert; do echo "=== $k ==="; docker exec vault-node1 vault kv 
 
 # Инициализируем хранилище KV V2
 docker exec -it vault-node1 vault secrets enable -path=secret-v2 kv-v2
+
+
+
+### Тест N: Хранилище секретов KV V1
+<details>
+<summary>Нажмите, чтобы развернуть список</summary>
+
+</details>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ### Что не переедет и вызовет падение OpenBao
 - Auto-Unseal через облачные KMS или PKCS#11 без плагинов: в OpenBao 2.7 все встроенные механизмы распечатывания (awskms, gcpckms, azurekeyvault, alicloudkms, ocikms, pkcs11) удалены из основного бинарника и вынесены во внешние плагины. Если у вас обычный Shamir Unseal (ручной ввод ключей), всё запустится штатно.
